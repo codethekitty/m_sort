@@ -1,16 +1,16 @@
 %% edit path
 
-set_path
+addpath('functions');
 
 %% Get superblocks
 clear
 
 clc
 tic
-rf_user_list=[16:20];
+rf_user_list=[2:3];
 
-tank_path = 'Z:\Jenn\Analysis\Electrophysiology\R animal data\JAL_R5';
-save_dir = 'Z:\Jenn\Analysis\Electrophysiology\R animal data\JAL_R5\Position 2';
+tank_path = 'Z:\khri-ses-lab\Shore-Basic-Science\Mike\Analysis\Single Unit Data\X Treatment Animals\X4_10_28_2020';
+save_dir = 'Z:\khri-ses-lab\Shore-Basic-Science\Mike\Analysis\Single Unit Data\X Treatment Animals\X4_debug';
 superblocks = build_sb(tank_path, save_dir, rf_user_list)
 %
 % coordinate=struct;
@@ -29,7 +29,7 @@ superblocks=load_sb(save_dir)
 
 %% Sorting
 clc
-m_sort(superblocks, tank_path, save_dir) 
+m_sort(superblocks, tank_path, save_dir,'skip') 
 
 
 

@@ -117,6 +117,7 @@ for i_block=1:length(rfs_user)
     waves=double(data.snips.(spike_var{1}).data);
     sortc=zeros(length(data.snips.(spike_var{1}).chan),1);
 
+    if ~isempty(data.epocs)
     partList=unique(data.epocs.FInd.data);
     part=zeros(length(data.snips.(spike_var{1}).chan),1);
     for i_p=1:length(partList)
@@ -125,6 +126,9 @@ for i_block=1:length(rfs_user)
         t_end=data.epocs.FInd.offset(idx(end));
         ts_idx=find(data.snips.(spike_var{1}).ts>=t_start&data.snips.(spike_var{1}).ts<=t_end);
         part(ts_idx)=partList(i_p);
+    end
+    else
+    part=ones(length(data.snips.(spike_var{1}).chan),1);
     end
     
     SB_com=table(block,chan,ts,sortc,waves,part);

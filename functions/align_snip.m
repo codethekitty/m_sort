@@ -25,20 +25,13 @@ function aligned = align_snip(snips, shift, fft)
 % ALIGNED   Matrix of aligned snippet spikes. Same dimensions as SNIPS. If FFT
 %           flag is set to True, this matrix is complex-valued.
 
-%     SetDefaultValue(3, 'fft', false);
-    fft = false;
-    
-    D = defaults();
+%     SetDefaultValue(3, 'fft', false);    
     width = size(snips, 2);
     
     
     % this function checks if THR is valid.
     [pre,post,thr,~] = event_threshold(snips);
     aligned = align_custom(snips, shift, thr, pre, post);
-    
-    if fft
-        aligned = align_fft(snips);
-    end
     
 end
 

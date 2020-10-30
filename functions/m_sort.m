@@ -23,6 +23,7 @@ function m_sort(superblock,tank_path,save_dir,varargin)
 % build_sb.m (*)
 % load_sb.m (*)
 % get_sorted_sst.m (*)
+% OTHER DEPENDENCIES NEED TO BE UPDATED HERE (10-30-2020 CW)
 %
 % v-1.0 (dated 5-28-2016)
 %
@@ -60,6 +61,17 @@ function m_sort(superblock,tank_path,save_dir,varargin)
 %
 % v-1.6 notes (9-25-2018):
 % Final saved data duplicated as json (python readable).
+%
+% v-1.7 notes (?-?-2019):
+% Fixed issue with eCSP vs eCSK vs CSPK when loading BUILD_SB (TDT synapse
+% problem
+%
+% v-1.8 notes (10-30-2020):
+% Fixed issue when there is no epocs during recording.
+%
+% v-2.0 (NEED TO GET RID OF SUPERSPIKETRAIN CLASS; TO BE UPDATED)
+%
+%
 
 
 [~,ttss1]=fileparts(tank_path);

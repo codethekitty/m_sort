@@ -588,14 +588,13 @@ classdef superspiketrain
             % and subtract that swep timestamp
             TrialCode=zeros(length(obj.Spikes.TS),1);
             blocker = nominal(obj.Block);
-            
+            no_epoc=0;
             for j=1:length(obj.Block)
-                obj.Block(j)
+                obj.Block(j);
                 %Determine off time in each trial for current block
                 swepoff=obj.Epocs.TSOff.swep(ismember(obj.Epocs.TSOff.Block,blocker(j)));
                 
-                %Uses histogram counting function to seperate timestamp
-                %data into bins
+                %Uses histogram counting function to seperate timestamp data into bins
                 try
                     [~,bins]=histc(obj.Spikes.TS(obj.Spikes.BlockIdx==j), ...
                         [obj.Epocs.TSOn.swep(ismember(obj.Epocs.TSOn.Block,blocker(j))); swepoff(end)]);
@@ -603,22 +602,28 @@ classdef superspiketrain
                     %assign here the trial number that each spike belongs to
                     TrialCode(obj.Spikes.BlockIdx==j) = ...
                         bins+(bins~=0).*(find(ismember(obj.Epocs.Values.Block,blocker(j)),1)-1);
-                catch   % GO BACK TO OLD STRATEGY WHEN 'HISTC' FAILS (CW EDIT)
-                    for TrialCount=1:length(obj.Indices.Trials)
-                        TrialCode( (obj.Spikes.BlockIdx==obj.Indices.Blocks(TrialCount))&((obj.Spikes.TS>obj.Epocs.TSOn.swep(TrialCount)) & ...
-                            (obj.Spikes.TS<obj.Epocs.TSOff.swep(TrialCount))),1)=TrialCount;
+                catch   % GO BACK TO OLD STRATEGY WHEN 'HISTC' FAILS
+                    if ~isnan(swepoff)
+                        for TrialCount=1:length(obj.Indices.Trials)
+                            TrialCode( (obj.Spikes.BlockIdx==obj.Indices.Blocks(TrialCount))&((obj.Spikes.TS>obj.Epocs.TSOn.swep(TrialCount)) & ...
+                                (obj.Spikes.TS<obj.Epocs.TSOff.swep(TrialCount))),1)=TrialCount;
+                        end
+                    else
+                        TrialCode(obj.Spikes.BlockIdx==j)=-1;
+                        no_epoc=1;
                     end
                     
                 end
             end
             if obj.Timing; fprintf('Spike-to-Trial calculation took %f seconds.\n',toc); tic; end;
-            
+
             obj.Spikes.TrialIdx=TrialCode;
             obj.Spikes(TrialCode==0,:)=[];
             clear TrialCode blocker j;
             if obj.Timing; fprintf('Assign timestamp to trials took %f seconds.\n',toc); tic; end; %#ok<UNRCH>
             
             %%% Convert timestamps to rasters
+            if ~no_epoc
             obj.Spikes.RasterSW=obj.Spikes.TS-obj.Epocs.TSOn.swep(obj.Spikes.TrialIdx);
             if ismember('s1ig',get(obj.Epocs.TSOn,'VarNames'))
                 obj.Spikes.RasterS1=obj.Spikes.TS-obj.Epocs.TSOn.s1ig(obj.Spikes.TrialIdx);
@@ -632,6 +637,12 @@ classdef superspiketrain
             end
             if ismember('etyp',get(obj.Epocs.TSOn,'VarNames'))
                 obj.Spikes.RasterE=obj.Spikes.TS-obj.Epocs.TSOn.etyp(obj.Spikes.TrialIdx);
+            end
+            
+            else
+                obj.Spikes.RasterS1=obj.Spikes.TS;
+                obj.Spikes.RasterS2=obj.Spikes.TS;
+                obj.Spikes.RasterE=obj.Spikes.TS;
             end
             
             if obj.Timing; fprintf('Convert timestamps to rasters took %f seconds.\n',toc); fprintf('Loading timestamps took %f seconds.\n',toc(tstart)); end;
